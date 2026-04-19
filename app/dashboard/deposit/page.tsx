@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { Copy, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { CheckCircle, Clock, XCircle } from 'lucide-react'
+import USDTDeposit from '@/components/USDTDeposit'
 
-const METHODS = ['EasyPaisa', 'JazzCash', 'Bank Transfer', 'USDT (TRC20)']
+const METHODS = ['EasyPaisa', 'JazzCash', 'Bank Transfer']
 
 const METHOD_DETAILS: Record<string, React.ReactNode> = {
   'EasyPaisa': (
@@ -60,6 +61,7 @@ export default function DepositPage() {
   const [loading, setLoading] = useState(false)
   const [deposits, setDeposits] = useState<Deposit[]>([])  
   const [kycStatus, setKycStatus] = useState<string>('loading')
+  const [activeTab, setActiveTab] = useState('USDT (Auto)')
   const supabase = createClient()
 
   useEffect(() => {
@@ -172,10 +174,36 @@ export default function DepositPage() {
   return (
     <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: '800px' }}>
       <h1 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '4px' }}>Deposit Funds</h1>
-      <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '28px' }}>
-        Submit a deposit request and upload your payment proof
+      <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '20px' }}>
+        Choose your deposit method
       </p>
 
+      {/* Method Tabs */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+        {['USDT (Auto)', 'Manual Payment'].map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)} style={{
+            padding: '8px 18px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+            fontSize: '13px', fontWeight: 600,
+            background: activeTab === tab ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'var(--bg-card)',
+            color: activeTab === tab ? 'white' : 'var(--text-secondary)',
+            border: activeTab === tab ? 'none' : '1px solid var(--border)',
+          }}>{tab}</button>
+        ))}
+      </div>
+
+      {/* USDT Auto Tab */}
+      {activeTab === 'USDT (Auto)' && (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', marginBottom: '32px' }}>
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '15px', fontWeight: 700 }}>💎 USDT Deposit (Automatic)</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>Balance credited automatically after blockchain confirmation</div>
+          </div>
+          <USDTDeposit />
+        </div>
+      )}
+
+      {/* Manual Payment Tab */}
+      {activeTab === 'Manual Payment' && (<>
       <style>{`@media(max-width:767px){.deposit-grid{grid-template-columns:1fr!important}}`}</style>
       <div className="deposit-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
         {/* Form */}
@@ -280,6 +308,8 @@ export default function DepositPage() {
           </div>
         </div>
       </div>
+
+      </>)}
 
       {/* Deposit History */}
       <div style={{

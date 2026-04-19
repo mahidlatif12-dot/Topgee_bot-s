@@ -55,7 +55,16 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const supabase = createClient()
 
-  useEffect(() => { checkAdmin() }, [])
+  useEffect(() => {
+    checkAdmin()
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      loadUsers()
+      loadDeposits()
+      loadWithdrawals()
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   async function checkAdmin() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -234,7 +243,13 @@ export default function AdminPage() {
       {/* KYC */}
       {tab === 'kyc' && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '16px' }}>KYC Verification Status</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700 }}>KYC Verification Status</h3>
+            <button onClick={loadUsers} style={{
+              padding: '6px 14px', background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+              borderRadius: '7px', color: 'var(--text-secondary)', fontSize: '12px', cursor: 'pointer',
+            }}>🔄 Refresh</button>
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '20px' }}>
             {[
               { label: 'Verified', count: users.filter(u => (u as Profile & {kyc_status:string}).kyc_status === 'verified').length, color: 'var(--accent-green)', bg: 'rgba(0,212,160,0.1)' },
@@ -252,7 +267,7 @@ export default function AdminPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['Name', 'Email', 'KYC Status', 'Balance', 'Joined'].map(h => (
+                  {['Name', 'Email', 'KYC Status', 'Balance', 'Actions'].map(h => (
                     <th key={h} style={{ textAlign: 'left', padding: '8px 12px', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '12px' }}>{h}</th>
                   ))}
                 </tr>
@@ -273,7 +288,26 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td style={{ padding: '12px', color: 'var(--accent-green)', fontWeight: 600 }}>${(u.balance || 0).toFixed(2)}</td>
-                      <td style={{ padding: '12px', color: 'var(--text-secondary)', fontSize: '11px' }}>{new Date(u.created_at).toLocaleDateString()}</td>
+                      <td style={{ padding: '12px' }}>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          {kyc !== 'verified' && (
+                            <button onClick={async () => {
+                              await fetch('/api/admin/update-kyc', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: u.id, status: 'verified' }) })
+                              loadUsers()
+                            }} style={{ padding: '4px 10px', background: 'rgba(0,212,160,0.15)', border: '1px solid rgba(0,212,160,0.3)', borderRadius: '6px', color: 'var(--accent-green)', fontSize: '11px', cursor: 'pointer' }}>
+                              ✅ Verify
+                            </button>
+                          )}
+                          {kyc !== 'rejected' && (
+                            <button onClick={async () => {
+                              await fetch('/api/admin/update-kyc', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: u.id, status: 'rejected' }) })
+                              loadUsers()
+                            }} style={{ padding: '4px 10px', background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)', borderRadius: '6px', color: 'var(--accent-red)', fontSize: '11px', cursor: 'pointer' }}>
+                              ❌ Reject
+                            </button>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   )
                 })}

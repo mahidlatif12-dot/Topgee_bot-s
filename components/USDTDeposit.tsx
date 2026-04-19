@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { Loader, CheckCircle, XCircle } from 'lucide-react'
 
 export default function USDTDeposit() {
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const status = searchParams.get('status')
+  const supabase = createClient()
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => setUserId(user?.id || null))
     if (status === 'success') toast.success('Payment submitted! Balance will update once confirmed.')
     if (status === 'cancel') toast.error('Payment cancelled.')
   }, [status])
@@ -24,7 +28,7 @@ export default function USDTDeposit() {
       const res = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: amt }),
+        body: JSON.stringify({ amount: amt, userId }),
       })
       const data = await res.json()
       if (!res.ok) return toast.error(data.error || 'Failed to create payment')

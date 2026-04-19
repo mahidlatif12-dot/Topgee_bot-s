@@ -1,14 +1,13 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function POST(req: Request) {
   try {
-    const { amount } = await req.json()
+    const { amount, userId } = await req.json()
     if (!amount || amount < 10) return NextResponse.json({ error: 'Minimum deposit is $10' }, { status: 400 })
-
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!userId) return NextResponse.json({ error: 'User ID required' }, { status: 400 })
+    const user = { id: userId }
 
     // Create NOWPayments hosted invoice
     const res = await fetch('https://api.nowpayments.io/v1/invoice', {

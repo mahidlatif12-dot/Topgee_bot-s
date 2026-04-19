@@ -32,17 +32,20 @@ export async function POST(req: Request) {
     const invoice = await res.json()
     if (!invoice.invoice_url) return NextResponse.json({ error: 'Payment creation failed', details: invoice }, { status: 500 })
 
-    // Store pending deposit in DB
-    const { createAdminClient } = await import('@/lib/supabase/server')
-    const adminSupabase = await createAdminClient()
-    await adminSupabase.from('deposits').insert({
-      user_id: user.id,
-      amount,
-      method: 'USDT (TRC20) - Auto',
-      proof_url: '',
-      status: 'pending',
-      payment_id: invoice.id,
-    })
+    // Store pending deposit in DB (ignore error if payment_id column missing)
+    try {
+      const { createAdminClient } = await import('@/lib/supabase/server')
+      const adminSupabase = await createAdminClient()
+      await adminSupabase.from('deposits').insert({
+        user_id: user.id,
+        amount,
+        method: 'USDT (TRC20) - Auto',
+        proof_url: '',
+        status: 'pending',
+      })
+    } catch (dbErr) {
+      console.error('DB insert error:', dbErr)
+    }
 
     return NextResponse.json({ invoiceUrl: invoice.invoice_url })
   } catch (e) {

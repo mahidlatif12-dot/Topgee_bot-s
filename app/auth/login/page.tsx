@@ -30,7 +30,7 @@ export default function LoginPage() {
     const supabase = createClient()
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: 'https://topgee-bot-s.vercel.app/dashboard' },
+      options: { redirectTo: 'https://topgeecapital.com/dashboard' },
     })
   }
 

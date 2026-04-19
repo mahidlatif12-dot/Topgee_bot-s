@@ -182,7 +182,7 @@ export default function DepositPage() {
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
         {['USDT (Auto)', 'Manual Payment'].map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} style={{
-            padding: '8px 18px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+            padding: '8px 18px', borderRadius: '8px', cursor: 'pointer',
             fontSize: '13px', fontWeight: 600,
             background: activeTab === tab ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'var(--bg-card)',
             color: activeTab === tab ? 'white' : 'var(--text-secondary)',

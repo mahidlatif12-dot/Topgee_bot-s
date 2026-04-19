@@ -170,13 +170,14 @@ export default function DepositPage() {
   }
 
   return (
-    <div style={{ padding: '32px', maxWidth: '800px' }}>
+    <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: '800px' }}>
       <h1 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '4px' }}>Deposit Funds</h1>
       <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '28px' }}>
         Submit a deposit request and upload your payment proof
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+      <style>{`@media(max-width:767px){.deposit-grid{grid-template-columns:1fr!important}}`}</style>
+      <div className="deposit-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
         {/* Form */}
         <form onSubmit={handleSubmit} style={{
           background: 'var(--bg-card)',

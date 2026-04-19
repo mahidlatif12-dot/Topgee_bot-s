@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     // Verify webhook signature
     const expectedSig = crypto
-      .createHmac('sha256', process.env.SUMSUB_SECRET_KEY!)
+      .createHmac('sha256', process.env.SUMSUB_WEBHOOK_SECRET || process.env.SUMSUB_SECRET_KEY!)
       .update(body)
       .digest('hex')
 

@@ -9,10 +9,10 @@ function createSignature(ts: number, method: string, path: string, body?: string
   return crypto.createHmac('sha256', SUMSUB_SECRET_KEY).update(data).digest('hex')
 }
 
-export async function createAccessToken(userId: string, levelName = 'id-and-liveness'): Promise<string> {
+export async function createAccessToken(userId: string, levelName = 'Topgee Capital KYC'): Promise<string> {
   const ts = Math.floor(Date.now() / 1000)
   const method = 'POST'
-  const path = `/resources/accessTokens?userId=${userId}&levelName=${levelName}&ttlInSecs=1800`
+  const path = `/resources/accessTokens?userId=${userId}&levelName=${encodeURIComponent(levelName)}&ttlInSecs=1800`
   const signature = createSignature(ts, method, path)
 
   const res = await fetch(`${SUMSUB_BASE_URL}${path}`, {

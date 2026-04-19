@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         success_url: 'https://topgeecapital.com/dashboard/deposit?status=success',
         cancel_url: 'https://topgeecapital.com/dashboard/deposit?status=cancel',
         order_id: `${user.id}_${Date.now()}`,
-        order_description: `Topgee Capital deposit for ${user.email}`,
+        order_description: `Topgee Capital deposit`,
       }),
     })
 

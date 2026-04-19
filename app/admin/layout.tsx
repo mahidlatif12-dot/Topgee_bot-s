@@ -1,24 +1,43 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import MobileNav from '@/components/MobileNav'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: profile } = await supabase
+  const adminSupabase = await createAdminClient()
+  const { data: profile } = await adminSupabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
-      <Sidebar profile={profile} />
-      <main style={{ flex: 1, marginLeft: '240px', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
+      <div style={{ display: 'none' }} className="desktop-sidebar">
+        <Sidebar profile={profile} />
+      </div>
+      <div className="mobile-nav">
+        <MobileNav profile={profile} />
+      </div>
+      <main className="main-content">
         {children}
       </main>
+      <style>{`
+        @media (min-width: 768px) {
+          .desktop-sidebar { display: block !important; }
+          .mobile-nav { display: none !important; }
+          .main-content { margin-left: 240px; min-height: 100vh; }
+        }
+        @media (max-width: 767px) {
+          .desktop-sidebar { display: none !important; }
+          .mobile-nav { display: block !important; }
+          .main-content { margin-left: 0 !important; padding-top: 56px; padding-bottom: 70px; min-height: 100vh; }
+        }
+      `}</style>
     </div>
   )
 }

@@ -40,7 +40,7 @@ interface Withdrawal {
   profiles?: { full_name: string; email: string }
 }
 
-type TabType = 'overview' | 'users' | 'deposits' | 'withdrawals' | 'profit'
+type TabType = 'overview' | 'users' | 'deposits' | 'withdrawals' | 'profit' | 'kyc'
 
 export default function AdminPage() {
   const [tab, setTab] = useState<TabType>('overview')
@@ -175,8 +175,11 @@ export default function AdminPage() {
   const pendingWithdrawals = withdrawals.filter(w => w.status === 'pending').length
   const totalDeposited = users.reduce((s, u) => s + (u.total_deposited || 0), 0)
 
+  const pendingKyc = users.filter(u => (u as Profile & { kyc_status: string }).kyc_status === 'pending').length
+
   const TABS: { key: TabType; label: string; icon: React.ReactNode }[] = [
     { key: 'overview', label: 'Overview', icon: <TrendingUp size={16} /> },
+    { key: 'kyc', label: `KYC ${pendingKyc > 0 ? `(${pendingKyc})` : ''}`, icon: <CheckCircle size={16} /> },
     { key: 'users', label: 'Users', icon: <Users size={16} /> },
     { key: 'deposits', label: `Deposits ${pendingDeposits > 0 ? `(${pendingDeposits})` : ''}`, icon: <ArrowDownCircle size={16} /> },
     { key: 'withdrawals', label: `Withdrawals ${pendingWithdrawals > 0 ? `(${pendingWithdrawals})` : ''}`, icon: <ArrowUpCircle size={16} /> },
@@ -225,6 +228,58 @@ export default function AdminPage() {
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{s.label}</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* KYC */}
+      {tab === 'kyc' && (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '16px' }}>KYC Verification Status</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+            {[
+              { label: 'Verified', count: users.filter(u => (u as Profile & {kyc_status:string}).kyc_status === 'verified').length, color: 'var(--accent-green)', bg: 'rgba(0,212,160,0.1)' },
+              { label: 'Pending', count: users.filter(u => (u as Profile & {kyc_status:string}).kyc_status === 'pending').length, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+              { label: 'Rejected', count: users.filter(u => (u as Profile & {kyc_status:string}).kyc_status === 'rejected').length, color: 'var(--accent-red)', bg: 'rgba(255,68,68,0.1)' },
+              { label: 'Not Started', count: users.filter(u => (u as Profile & {kyc_status:string}).kyc_status === 'none' || !(u as Profile & {kyc_status:string}).kyc_status).length, color: 'var(--text-secondary)', bg: 'var(--bg-secondary)' },
+            ].map((s, i) => (
+              <div key={i} style={{ background: s.bg, border: `1px solid ${s.color}30`, borderRadius: '10px', padding: '16px', textAlign: 'center' }}>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: s.color }}>{s.count}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['Name', 'Email', 'KYC Status', 'Balance', 'Joined'].map(h => (
+                    <th key={h} style={{ textAlign: 'left', padding: '8px 12px', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '12px' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => {
+                  const kyc = (u as Profile & {kyc_status:string}).kyc_status || 'none'
+                  const kycColor = kyc === 'verified' ? 'var(--accent-green)' : kyc === 'pending' ? '#f59e0b' : kyc === 'rejected' ? 'var(--accent-red)' : 'var(--text-secondary)'
+                  const kycBg = kyc === 'verified' ? 'rgba(0,212,160,0.15)' : kyc === 'pending' ? 'rgba(245,158,11,0.15)' : kyc === 'rejected' ? 'rgba(255,68,68,0.15)' : 'var(--bg-secondary)'
+                  const kycLabel = kyc === 'verified' ? '✅ Verified' : kyc === 'pending' ? '⏳ Pending' : kyc === 'rejected' ? '❌ Rejected' : '— Not Started'
+                  return (
+                    <tr key={u.id} style={{ borderBottom: '1px solid rgba(42,42,58,0.5)' }}>
+                      <td style={{ padding: '12px', fontWeight: 600 }}>{u.full_name}</td>
+                      <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>{u.email}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span style={{ padding: '3px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, color: kycColor, background: kycBg }}>
+                          {kycLabel}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px', color: 'var(--accent-green)', fontWeight: 600 }}>${(u.balance || 0).toFixed(2)}</td>
+                      <td style={{ padding: '12px', color: 'var(--text-secondary)', fontSize: '11px' }}>{new Date(u.created_at).toLocaleDateString()}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

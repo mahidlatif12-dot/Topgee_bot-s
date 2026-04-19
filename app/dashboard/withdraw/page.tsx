@@ -31,7 +31,8 @@ export default function WithdrawPage() {
   async function checkKyc() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('profiles').select('kyc_status').eq('id', user.id).single()
+    const { data } = await supabase.from('profiles').select('kyc_status, is_admin').eq('id', user.id).single()
+    if (data?.is_admin) { setKycStatus('verified'); return }
     setKycStatus(data?.kyc_status || 'none')
   }
 

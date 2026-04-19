@@ -29,7 +29,8 @@ export default async function DashboardPage() {
   const profit = profile?.total_profit || 0
   const roi = deposited > 0 ? ((profit / deposited) * 100).toFixed(2) : '0.00'
   const kycStatus = profile?.kyc_status || 'none'
-  const kycVerified = kycStatus === 'verified'
+  const isAdmin = profile?.is_admin || false
+  const kycVerified = kycStatus === 'verified' || isAdmin
 
   return (
     <div style={{ padding: '32px', maxWidth: '1200px' }}>

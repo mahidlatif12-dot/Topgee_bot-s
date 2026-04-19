@@ -68,7 +68,7 @@ export default function SignupPage() {
     }
 
     setLoading(false)
-    toast.success('Account created! Welcome to Topgee Bots.')
+    toast.success('Account created! Welcome to Topgee Capital.')
     router.push('/dashboard')
     router.refresh()
   }
@@ -92,7 +92,7 @@ export default function SignupPage() {
               background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-            }}>Topgee Bots</span>
+            }}>Topgee Capital</span>
           </Link>
           <p style={{ color: 'var(--text-secondary)', marginTop: '8px', fontSize: '14px' }}>Create your investor account</p>
         </div>

@@ -66,7 +66,7 @@ export default function LoginPage() {
               background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-            }}>Topgee Bots</span>
+            }}>Topgee Capital</span>
           </Link>
           <p style={{ color: 'var(--text-secondary)', marginTop: '8px', fontSize: '14px' }}>Sign in to your account</p>
         </div>

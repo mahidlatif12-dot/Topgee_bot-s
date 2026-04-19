@@ -3,7 +3,7 @@ import './globals.css'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
-  title: 'Topgee Bots — Professional Forex & Gold Trading',
+  title: 'Topgee Capital — Professional Forex & Gold Trading',
   description: 'Professional automated trading platform for Forex & Gold (XAUUSD)',
 }
 

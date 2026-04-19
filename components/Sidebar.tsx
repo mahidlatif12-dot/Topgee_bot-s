@@ -68,7 +68,7 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
             fontSize: '18px', fontWeight: 800,
             background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          }}>Topgee Bots</span>
+          }}>Topgee Capital</span>
         </div>
       </div>
 

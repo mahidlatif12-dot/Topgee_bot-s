@@ -25,7 +25,7 @@ export default function HomePage() {
             background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-          }}>Topgee Bots</span>
+          }}>Topgee Capital</span>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <Link href="/auth/login" style={{
@@ -91,7 +91,7 @@ export default function HomePage() {
           marginBottom: '40px',
           lineHeight: 1.7,
         }}>
-          Topgee Bots manages your investment through professional Forex & Gold (XAUUSD) trading.
+          Topgee Capital manages your investment through professional Forex & Gold (XAUUSD) trading.
           Transparent performance. Real withdrawals. No hidden fees.
         </p>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -232,7 +232,7 @@ export default function HomePage() {
           textAlign: 'center',
         }}>
           <h2 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '12px' }}>Ready to grow your capital?</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '28px' }}>Join hundreds of investors already earning with Topgee Bots.</p>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '28px' }}>Join hundreds of investors already earning with Topgee Capital.</p>
           <Link href="/auth/signup" style={{
             padding: '14px 40px',
             borderRadius: '10px',
@@ -256,9 +256,9 @@ export default function HomePage() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
           <span style={{ fontSize: '18px' }}>🤖</span>
-          <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Topgee Bots</span>
+          <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Topgee Capital</span>
         </div>
-        <p>© 2025 Topgee Bots. All rights reserved. Trading involves risk.</p>
+        <p>© 2025 Topgee Capital. All rights reserved. Trading involves risk.</p>
       </footer>
     </div>
   )

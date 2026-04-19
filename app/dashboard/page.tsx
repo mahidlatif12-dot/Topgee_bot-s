@@ -92,8 +92,8 @@ export default async function DashboardPage() {
             label: 'Total Deposited',
             value: `$${deposited.toFixed(2)}`,
             icon: <ArrowDownCircle size={20} />,
-            color: 'var(--accent-indigo)',
-            bg: 'rgba(99,102,241,0.1)',
+            color: '#f59e0b',
+            bg: 'rgba(245,158,11,0.1)',
           },
           {
             label: 'Total Profit',
@@ -142,7 +142,7 @@ export default async function DashboardPage() {
           alignItems: 'center',
           gap: '8px',
           padding: '10px 20px',
-          background: 'linear-gradient(135deg, #6366f1, #4f51e0)',
+          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
           borderRadius: '8px',
           color: 'white',
           textDecoration: 'none',
@@ -209,7 +209,7 @@ export default async function DashboardPage() {
             color: 'var(--text-secondary)',
             fontSize: '14px',
           }}>
-            No transactions yet. <Link href="/dashboard/deposit" style={{ color: 'var(--accent-indigo)' }}>Make your first deposit →</Link>
+            No transactions yet. <Link href="/dashboard/deposit" style={{ color: '#f59e0b' }}>Make your first deposit →</Link>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -236,9 +236,9 @@ export default async function DashboardPage() {
                         borderRadius: '6px',
                         fontSize: '11px',
                         fontWeight: 600,
-                        background: tx.type === 'deposit' ? 'rgba(99,102,241,0.15)' :
+                        background: tx.type === 'deposit' ? 'rgba(245,158,11,0.15)' :
                           tx.type === 'profit' ? 'rgba(0,212,160,0.15)' : 'rgba(255,68,68,0.15)',
-                        color: tx.type === 'deposit' ? 'var(--accent-indigo)' :
+                        color: tx.type === 'deposit' ? '#f59e0b' :
                           tx.type === 'profit' ? 'var(--accent-green)' : 'var(--accent-red)',
                       }}>
                         {tx.type.toUpperCase()}

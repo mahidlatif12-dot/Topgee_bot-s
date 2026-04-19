@@ -67,7 +67,7 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
           <span style={{ fontSize: '22px' }}>🤖</span>
           <span style={{
             fontSize: '18px', fontWeight: 800,
-            background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           }}>Topgee Capital</span>
         </div>
@@ -83,8 +83,8 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
               padding: '10px 12px', borderRadius: '8px', marginBottom: '4px',
               textDecoration: 'none', fontSize: '14px',
               fontWeight: active ? 600 : 400,
-              color: active ? 'var(--accent-indigo)' : 'var(--text-secondary)',
-              background: active ? 'rgba(99,102,241,0.12)' : 'transparent',
+              color: active ? '#f59e0b' : 'var(--text-secondary)',
+              background: active ? 'rgba(245,158,11,0.12)' : 'transparent',
             }}>
               {item.icon} {item.label}
             </Link>

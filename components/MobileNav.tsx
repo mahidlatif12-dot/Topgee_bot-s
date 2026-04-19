@@ -59,7 +59,7 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
           <span style={{ fontSize: '20px' }}>🤖</span>
           <span style={{
             fontSize: '16px', fontWeight: 800,
-            background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           }}>Topgee Capital</span>
         </Link>
@@ -107,8 +107,8 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
                   display: 'flex', alignItems: 'center', gap: '12px',
                   padding: '14px 16px', borderRadius: '10px', textDecoration: 'none',
                   fontSize: '15px', fontWeight: active ? 600 : 400,
-                  color: active ? 'var(--accent-indigo)' : 'var(--text-primary)',
-                  background: active ? 'rgba(99,102,241,0.12)' : 'var(--bg-card)',
+                  color: active ? '#f59e0b' : 'var(--text-primary)',
+                  background: active ? 'rgba(245,158,11,0.12)' : 'var(--bg-card)',
                   border: '1px solid var(--border)',
                 }}>
                   {item.icon} {item.label}
@@ -153,8 +153,8 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
             <Link key={item.href} href={item.href} style={{
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
               padding: '10px 4px 8px', textDecoration: 'none', gap: '3px',
-              color: active ? 'var(--accent-indigo)' : 'var(--text-secondary)',
-              borderTop: active ? '2px solid var(--accent-indigo)' : '2px solid transparent',
+              color: active ? '#f59e0b' : 'var(--text-secondary)',
+              borderTop: active ? '2px solid #f59e0b' : '2px solid transparent',
             }}>
               {item.icon}
               <span style={{ fontSize: '10px', fontWeight: active ? 600 : 400 }}>{item.label}</span>

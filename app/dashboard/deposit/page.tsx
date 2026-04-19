@@ -9,24 +9,24 @@ const METHODS = ['EasyPaisa', 'JazzCash', 'Bank Transfer', 'USDT (TRC20)']
 
 const METHOD_DETAILS: Record<string, React.ReactNode> = {
   'EasyPaisa': (
-    <div style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
-      <div style={{ fontWeight: 700, marginBottom: '8px', color: 'var(--accent-indigo)' }}>📱 EasyPaisa Details</div>
+    <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
+      <div style={{ fontWeight: 700, marginBottom: '8px', color: '#f59e0b' }}>📱 EasyPaisa Details</div>
       <div>Account Name: <strong>Muhammad Ahmed</strong></div>
       <div>Account Number: <strong>0300-1234567</strong></div>
       <div style={{ marginTop: '8px', color: 'var(--text-secondary)', fontSize: '12px' }}>Send the exact amount and upload a screenshot as proof.</div>
     </div>
   ),
   'JazzCash': (
-    <div style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
-      <div style={{ fontWeight: 700, marginBottom: '8px', color: 'var(--accent-indigo)' }}>📱 JazzCash Details</div>
+    <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
+      <div style={{ fontWeight: 700, marginBottom: '8px', color: '#f59e0b' }}>📱 JazzCash Details</div>
       <div>Account Name: <strong>Muhammad Ahmed</strong></div>
       <div>Account Number: <strong>0311-7654321</strong></div>
       <div style={{ marginTop: '8px', color: 'var(--text-secondary)', fontSize: '12px' }}>Send the exact amount and upload a screenshot as proof.</div>
     </div>
   ),
   'Bank Transfer': (
-    <div style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
-      <div style={{ fontWeight: 700, marginBottom: '8px', color: 'var(--accent-indigo)' }}>🏦 Bank Transfer Details</div>
+    <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
+      <div style={{ fontWeight: 700, marginBottom: '8px', color: '#f59e0b' }}>🏦 Bank Transfer Details</div>
       <div>Bank: <strong>Meezan Bank</strong></div>
       <div>Account Title: <strong>Muhammad Ahmed</strong></div>
       <div>Account Number: <strong>0123456789012345</strong></div>
@@ -35,8 +35,8 @@ const METHOD_DETAILS: Record<string, React.ReactNode> = {
     </div>
   ),
   'USDT (TRC20)': (
-    <div style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
-      <div style={{ fontWeight: 700, marginBottom: '8px', color: 'var(--accent-indigo)' }}>💎 USDT TRC20 Wallet</div>
+    <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
+      <div style={{ fontWeight: 700, marginBottom: '8px', color: '#f59e0b' }}>💎 USDT TRC20 Wallet</div>
       <div style={{ fontFamily: 'monospace', fontSize: '13px', wordBreak: 'break-all', background: 'var(--bg-secondary)', padding: '10px', borderRadius: '6px', marginTop: '4px' }}>
         TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       </div>
@@ -159,7 +159,7 @@ export default function DepositPage() {
           {kycStatus !== 'pending' && (
             <a href="/dashboard/kyc" style={{
               display: 'inline-block', padding: '12px 28px',
-              background: 'linear-gradient(135deg, #6366f1, #4f51e0)',
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
               borderRadius: '8px', color: 'white', textDecoration: 'none',
               fontSize: '14px', fontWeight: 700,
             }}>Complete KYC Now →</a>
@@ -246,7 +246,7 @@ export default function DepositPage() {
             disabled={loading}
             style={{
               width: '100%', padding: '13px',
-              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #6366f1, #4f51e0)',
+              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #f59e0b, #d97706)',
               border: 'none', borderRadius: '8px', color: 'white',
               fontSize: '15px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
             }}

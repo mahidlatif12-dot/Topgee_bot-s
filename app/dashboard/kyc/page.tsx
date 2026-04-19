@@ -142,12 +142,12 @@ export default function KYCPage() {
       {kycStatus === 'none' && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: '12px',
-          background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)',
+          background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)',
           borderRadius: '12px', padding: '20px', marginBottom: '24px',
         }}>
-          <Shield size={32} style={{ color: 'var(--accent-indigo)', flexShrink: 0 }} />
+          <Shield size={32} style={{ color: '#f59e0b', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--accent-indigo)' }}>Verify Your Identity</div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: '#f59e0b' }}>Verify Your Identity</div>
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '2px' }}>
               Complete KYC to unlock deposits and withdrawals. Takes 2-3 minutes.
             </div>

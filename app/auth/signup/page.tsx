@@ -89,7 +89,7 @@ export default function SignupPage() {
             <span style={{
               fontSize: '22px',
               fontWeight: 800,
-              background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>Topgee Capital</span>
@@ -191,7 +191,7 @@ export default function SignupPage() {
             style={{
               width: '100%',
               padding: '13px',
-              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #6366f1, #4f51e0)',
+              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #f59e0b, #d97706)',
               border: 'none',
               borderRadius: '8px',
               color: 'white',
@@ -230,7 +230,7 @@ export default function SignupPage() {
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px' }}>
           Already have an account?{' '}
-          <Link href="/auth/login" style={{ color: 'var(--accent-indigo)', fontWeight: 600, textDecoration: 'none' }}>
+          <Link href="/auth/login" style={{ color: '#f59e0b', fontWeight: 600, textDecoration: 'none' }}>
             Sign in
           </Link>
         </p>

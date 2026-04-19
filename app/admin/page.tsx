@@ -176,7 +176,7 @@ export default function AdminPage() {
     <div style={{ padding: '32px', textAlign: 'center' }}>
       <h2 style={{ color: 'var(--accent-red)', marginBottom: '12px' }}>Access Denied</h2>
       <p style={{ color: 'var(--text-secondary)' }}>You don&apos;t have admin privileges.</p>
-      <Link href="/dashboard" style={{ color: 'var(--accent-indigo)', marginTop: '16px', display: 'inline-block' }}>← Back to Dashboard</Link>
+      <Link href="/dashboard" style={{ color: '#f59e0b', marginTop: '16px', display: 'inline-block' }}>← Back to Dashboard</Link>
     </div>
   )
 
@@ -227,7 +227,7 @@ export default function AdminPage() {
       {tab === 'overview' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           {[
-            { label: 'Total Users', value: users.length, color: 'var(--accent-indigo)' },
+            { label: 'Total Users', value: users.length, color: '#f59e0b' },
             { label: 'Pending Deposits', value: pendingDeposits, color: '#f59e0b' },
             { label: 'Pending Withdrawals', value: pendingWithdrawals, color: 'var(--accent-red)' },
             { label: 'Total Deposited', value: `$${totalDeposited.toFixed(2)}`, color: 'var(--accent-green)' },
@@ -370,7 +370,7 @@ export default function AdminPage() {
                     <td style={{ padding: '12px', color: 'var(--accent-green)', fontWeight: 700 }}>${d.amount.toFixed(2)}</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>{d.method}</td>
                     <td style={{ padding: '12px' }}>
-                      {d.proof_url ? <a href={d.proof_url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-indigo)', fontSize: '12px' }}>View</a> : <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>None</span>}
+                      {d.proof_url ? <a href={d.proof_url} target="_blank" rel="noreferrer" style={{ color: '#f59e0b', fontSize: '12px' }}>View</a> : <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>None</span>}
                     </td>
                     <td style={{ padding: '12px' }}>
                       <span style={{
@@ -542,7 +542,7 @@ export default function AdminPage() {
               </div>
             </div>
             <button onClick={adjustBalance} disabled={loading} style={{
-              width: '100%', padding: '10px', background: 'linear-gradient(135deg, #6366f1, #4f51e0)',
+              width: '100%', padding: '10px', background: 'linear-gradient(135deg, #f59e0b, #d97706)',
               border: 'none', borderRadius: '8px', color: 'white', fontSize: '14px', fontWeight: 600, cursor: 'pointer',
             }}>
               {loading ? 'Updating...' : 'Update Balance'}

@@ -22,7 +22,7 @@ export default function HomePage() {
           <span style={{
             fontSize: '20px',
             fontWeight: 800,
-            background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>Topgee Capital</span>
@@ -40,7 +40,7 @@ export default function HomePage() {
           <Link href="/auth/signup" style={{
             padding: '8px 20px',
             borderRadius: '8px',
-            background: 'var(--accent-indigo)',
+            background: '#f59e0b',
             color: 'white',
             textDecoration: 'none',
             fontSize: '14px',
@@ -60,9 +60,9 @@ export default function HomePage() {
           display: 'inline-block',
           padding: '6px 16px',
           borderRadius: '100px',
-          background: 'rgba(99,102,241,0.15)',
-          border: '1px solid rgba(99,102,241,0.3)',
-          color: '#a5b4fc',
+          background: 'rgba(245,158,11,0.15)',
+          border: '1px solid rgba(245,158,11,0.3)',
+          color: '#fcd34d',
           fontSize: '13px',
           fontWeight: 500,
           marginBottom: '24px',
@@ -80,7 +80,7 @@ export default function HomePage() {
         }}>
           Your Capital.<br />
           <span style={{
-            background: 'linear-gradient(135deg, #6366f1, #00d4a0)',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>Our Expertise.</span>
@@ -98,7 +98,7 @@ export default function HomePage() {
           <Link href="/auth/signup" style={{
             padding: '14px 32px',
             borderRadius: '10px',
-            background: 'linear-gradient(135deg, #6366f1, #4f51e0)',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             color: 'white',
             textDecoration: 'none',
             fontSize: '16px',
@@ -139,7 +139,7 @@ export default function HomePage() {
             padding: '24px',
             textAlign: 'center',
           }}>
-            <div style={{ color: 'var(--accent-indigo)', marginBottom: '8px', display: 'flex', justifyContent: 'center' }}>{stat.icon}</div>
+            <div style={{ color: '#f59e0b', marginBottom: '8px', display: 'flex', justifyContent: 'center' }}>{stat.icon}</div>
             <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>{stat.value}</div>
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{stat.label}</div>
           </div>
@@ -198,17 +198,17 @@ export default function HomePage() {
                 right: '20px',
                 fontSize: '48px',
                 fontWeight: 900,
-                color: 'rgba(99,102,241,0.08)',
+                color: 'rgba(245,158,11,0.08)',
               }}>{item.step}</div>
               <div style={{
                 width: '52px',
                 height: '52px',
                 borderRadius: '12px',
-                background: 'rgba(99,102,241,0.15)',
+                background: 'rgba(245,158,11,0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--accent-indigo)',
+                color: '#f59e0b',
                 marginBottom: '16px',
               }}>{item.icon}</div>
               <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '10px' }}>{item.title}</h3>
@@ -225,8 +225,8 @@ export default function HomePage() {
         padding: '0 24px',
       }}>
         <div style={{
-          background: 'linear-gradient(135deg, rgba(99,102,241,0.2), rgba(0,212,160,0.1))',
-          border: '1px solid rgba(99,102,241,0.3)',
+          background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(0,212,160,0.1))',
+          border: '1px solid rgba(245,158,11,0.3)',
           borderRadius: '20px',
           padding: '48px',
           textAlign: 'center',
@@ -236,7 +236,7 @@ export default function HomePage() {
           <Link href="/auth/signup" style={{
             padding: '14px 40px',
             borderRadius: '10px',
-            background: 'linear-gradient(135deg, #6366f1, #4f51e0)',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             color: 'white',
             textDecoration: 'none',
             fontSize: '16px',

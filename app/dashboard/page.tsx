@@ -28,18 +28,49 @@ export default async function DashboardPage() {
   const deposited = profile?.total_deposited || 0
   const profit = profile?.total_profit || 0
   const roi = deposited > 0 ? ((profit / deposited) * 100).toFixed(2) : '0.00'
+  const kycStatus = profile?.kyc_status || 'none'
+  const kycVerified = kycStatus === 'verified'
 
   return (
     <div style={{ padding: '32px', maxWidth: '1200px' }}>
       {/* Header */}
-      <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '4px' }}>
-          Welcome back, {profile?.full_name?.split(' ')[0] || 'Investor'} 👋
-        </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-          Here&apos;s your portfolio overview
-        </p>
+      <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '4px' }}>
+            Welcome back, {profile?.full_name?.split(' ')[0] || 'Investor'} 👋
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+            Here&apos;s your portfolio overview
+          </p>
+        </div>
+        <Link href="/dashboard/kyc" style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: '6px 14px', borderRadius: '100px', textDecoration: 'none', fontSize: '12px', fontWeight: 600,
+          background: kycVerified ? 'rgba(0,212,160,0.15)' : kycStatus === 'pending' ? 'rgba(245,158,11,0.15)' : 'rgba(255,68,68,0.15)',
+          color: kycVerified ? 'var(--accent-green)' : kycStatus === 'pending' ? '#f59e0b' : 'var(--accent-red)',
+          border: `1px solid ${kycVerified ? 'rgba(0,212,160,0.3)' : kycStatus === 'pending' ? 'rgba(245,158,11,0.3)' : 'rgba(255,68,68,0.3)'}`,
+        }}>
+          {kycVerified ? '✅ KYC Verified' : kycStatus === 'pending' ? '⏳ KYC Pending' : '⚠️ KYC Required'}
+        </Link>
       </div>
+
+      {/* KYC Warning Banner */}
+      {!kycVerified && (
+        <Link href="/dashboard/kyc" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)',
+          borderRadius: '10px', padding: '14px 18px', marginBottom: '20px', textDecoration: 'none',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '20px' }}>🔒</span>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#f59e0b' }}>Identity Verification Required</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Complete KYC to unlock deposits and withdrawals</div>
+            </div>
+          </div>
+          <span style={{ color: '#f59e0b', fontSize: '13px', fontWeight: 600 }}>Verify Now →</span>
+        </Link>
+      )}
 
       {/* Stats Cards */}
       <div style={{

@@ -58,10 +58,21 @@ export default function DepositPage() {
   const [method, setMethod] = useState('EasyPaisa')
   const [proofFile, setProofFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
-  const [deposits, setDeposits] = useState<Deposit[]>([])
+  const [deposits, setDeposits] = useState<Deposit[]>([])  
+  const [kycStatus, setKycStatus] = useState<string>('loading')
   const supabase = createClient()
 
-  useEffect(() => { fetchDeposits() }, [])
+  useEffect(() => {
+    fetchDeposits()
+    checkKyc()
+  }, [])
+
+  async function checkKyc() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase.from('profiles').select('kyc_status').eq('id', user.id).single()
+    setKycStatus(data?.kyc_status || 'none')
+  }
 
   async function fetchDeposits() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -127,6 +138,33 @@ export default function DepositPage() {
       }}>
         {s.icon} {status.toUpperCase()}
       </span>
+    )
+  }
+
+  if (kycStatus !== 'loading' && kycStatus !== 'verified') {
+    return (
+      <div style={{ padding: '32px', maxWidth: '600px' }}>
+        <div style={{
+          background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)',
+          borderRadius: '16px', padding: '40px', textAlign: 'center',
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
+          <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '8px', color: '#f59e0b' }}>KYC Verification Required</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
+            {kycStatus === 'pending'
+              ? 'Your KYC is under review. Deposits will be unlocked once verified (usually within minutes).'
+              : 'You need to complete identity verification before making deposits.'}
+          </p>
+          {kycStatus !== 'pending' && (
+            <a href="/dashboard/kyc" style={{
+              display: 'inline-block', padding: '12px 28px',
+              background: 'linear-gradient(135deg, #6366f1, #4f51e0)',
+              borderRadius: '8px', color: 'white', textDecoration: 'none',
+              fontSize: '14px', fontWeight: 700,
+            }}>Complete KYC Now →</a>
+          )}
+        </div>
+      </div>
     )
   }
 

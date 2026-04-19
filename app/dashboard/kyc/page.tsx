@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { CheckCircle, Clock, XCircle, Shield } from 'lucide-react'
 
@@ -9,6 +10,7 @@ export default function KYCPage() {
   const [kycStatus, setKycStatus] = useState<string>('none')
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
+  const router = useRouter()
 
   useEffect(() => {
     loadStatus()
@@ -44,8 +46,23 @@ export default function KYCPage() {
           .on('idCheck.onStepCompleted', () => {
             setKycStatus('pending')
           })
+          .on('idCheck.onApplicantSubmitted', () => {
+            setKycStatus('pending')
+            // Update DB
+            supabase.auth.getUser().then(({ data: { user } }) => {
+              if (user) supabase.from('profiles').update({ kyc_status: 'pending' }).eq('id', user.id)
+            })
+            // Redirect to dashboard after 2 sec
+            setTimeout(() => router.push('/dashboard'), 2000)
+          })
           .on('idCheck.onApplicantStatusChanged', (payload: { reviewResult?: { reviewAnswer: string } }) => {
-            if (payload?.reviewResult?.reviewAnswer === 'GREEN') setKycStatus('verified')
+            if (payload?.reviewResult?.reviewAnswer === 'GREEN') {
+              setKycStatus('verified')
+              supabase.auth.getUser().then(({ data: { user } }) => {
+                if (user) supabase.from('profiles').update({ kyc_status: 'verified' }).eq('id', user.id)
+              })
+              setTimeout(() => router.push('/dashboard/deposit'), 2000)
+            }
             if (payload?.reviewResult?.reviewAnswer === 'RED') setKycStatus('rejected')
           })
           .build()

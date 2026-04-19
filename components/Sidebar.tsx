@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutDashboard, ArrowDownCircle, ArrowUpCircle, LogOut, Settings } from 'lucide-react'
+import { LayoutDashboard, ArrowDownCircle, ArrowUpCircle, LogOut, Settings, ShieldCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 
@@ -45,6 +45,7 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
     { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
     { href: '/dashboard/deposit', label: 'Deposit', icon: <ArrowDownCircle size={18} /> },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: <ArrowUpCircle size={18} /> },
+    { href: '/dashboard/kyc', label: 'KYC Verification', icon: <ShieldCheck size={18} /> },
   ]
 
   return (

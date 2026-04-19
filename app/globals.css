@@ -40,3 +40,35 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #3a3a50;
 }
+
+/* Button press effects */
+button, a[href] {
+  transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease;
+}
+
+button:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+a[href]:active {
+  transform: scale(0.97);
+  opacity: 0.8;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Input focus effects */
+input:focus, select:focus, textarea:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.15) !important;
+  outline: none !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}

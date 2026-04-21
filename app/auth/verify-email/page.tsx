@@ -168,7 +168,11 @@ function VerifyEmailContent() {
 
           <form onSubmit={handleVerify}>
             {/* OTP Input boxes */}
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '24px' }}
+            <style>{`
+              .otp-box { width: 48px; height: 56px; font-size: 22px; }
+              @media (max-width: 400px) { .otp-box { width: 38px; height: 48px; font-size: 18px; } }
+            `}</style>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '24px' }}
               onPaste={handlePaste}>
               {otp.map((digit, i) => (
                 <input
@@ -181,9 +185,9 @@ function VerifyEmailContent() {
                   onChange={e => handleChange(i, e.target.value)}
                   onKeyDown={e => handleKeyDown(i, e)}
                   autoFocus={i === 0}
+                  className="otp-box"
                   style={{
-                    width: '48px', height: '56px',
-                    textAlign: 'center', fontSize: '22px', fontWeight: 800,
+                    textAlign: 'center', fontWeight: 800,
                     background: digit ? 'rgba(16,185,129,0.1)' : 'var(--bg-secondary)',
                     border: digit ? '2px solid var(--accent-green)' : '1px solid var(--border)',
                     borderRadius: '10px',

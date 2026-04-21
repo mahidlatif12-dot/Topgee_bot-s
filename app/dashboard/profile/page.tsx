@@ -459,7 +459,7 @@ export default function ProfilePage() {
                 <p style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'var(--text-primary)' }}>
                   Step 2 — Enter the 6-digit code from the app:
                 </p>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div className="totp-row" style={{ display: 'flex', gap: '10px' }}>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -495,7 +495,13 @@ export default function ProfilePage() {
         </>
       )}
 
-      <style>{`@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }`}</style>
+      <style>{`
+        @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+        @media(max-width:480px) {
+          .totp-row { flex-direction: column !important; }
+          .totp-row input { margin-bottom: 10px; }
+        }
+      `}</style>
     </div>
   )
 }

@@ -1,74 +1,187 @@
 @import "tailwindcss";
 
-:root {
-  --bg-primary: #0a0900;
-  --bg-secondary: #111008;
-  --bg-card: #18160a;
-  --bg-hover: #211e0e;
-  --border: #2e2a14;
-  --text-primary: #f5f0e0;
-  --text-secondary: #a09880;
-  --accent-green: #00d4a0;
-  --accent-red: #ff4444;
-  --accent-indigo: #f59e0b;
-  --accent-indigo-hover: #d97706;
+/* ── Emerald + Charcoal Theme ─────────────────────────────────────────────── */
+:root, [data-theme="dark"] {
+  --bg-primary:    #141414;
+  --bg-secondary:  #1a1a1a;
+  --bg-card:       #1e1e1e;
+  --bg-hover:      #242424;
+  --border:        rgba(255,255,255,0.07);
+  --text-primary:  #ffffff;
+  --text-secondary:#8a8a8a;
+  --accent-green:  #10b981;
+  --accent-green-light: #34d399;
+  --accent-green-dark:  #059669;
+  --accent-green-glow:  rgba(16,185,129,0.3);
+  --accent-red:    #f87171;
+  --accent-indigo: #10b981;
+  --accent-indigo-hover: #059669;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+[data-theme="light"] {
+  --bg-primary:    #f4f7f5;
+  --bg-secondary:  #eaf2ee;
+  --bg-card:       #ffffff;
+  --bg-hover:      #e0ede7;
+  --border:        rgba(0,0,0,0.08);
+  --text-primary:  #0f1a14;
+  --text-secondary:#4a6358;
+  --accent-green:  #059669;
+  --accent-green-light: #10b981;
+  --accent-green-dark:  #047857;
+  --accent-green-glow:  rgba(5,150,105,0.2);
+  --accent-red:    #dc2626;
+  --accent-indigo: #059669;
+  --accent-indigo-hover: #047857;
 }
+
+* { box-sizing: border-box; padding: 0; margin: 0; }
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #3a3a50;
-}
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--accent-green); border-radius: 4px; opacity: 0.5; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-green-light); }
 
-/* Button press effects */
-button, a[href] {
-  transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease;
-}
-
-button:active {
-  transform: scale(0.96);
-  opacity: 0.85;
-}
-
-a[href]:active {
-  transform: scale(0.97);
-  opacity: 0.8;
-}
-
-button:hover:not(:disabled) {
-  filter: brightness(1.1);
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Input focus effects */
+/* ── Inputs ───────────────────────────────────────────────────────────────── */
 input:focus, select:focus, textarea:focus {
-  border-color: #f59e0b !important;
-  box-shadow: 0 0 0 3px rgba(245,158,11,0.15) !important;
+  border-color: var(--accent-green) !important;
+  box-shadow: 0 0 0 3px var(--accent-green-glow) !important;
   outline: none !important;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* ── Page transition ─────────────────────────────────────────────────────── */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+main, .main-content {
+  animation: pageIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+/* ── Buttons & links ──────────────────────────────────────────────────────── */
+button, a[href] {
+  transition: transform 0.2s cubic-bezier(0.16,1,0.3,1),
+              opacity 0.2s ease,
+              filter 0.2s ease,
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              color 0.2s ease;
+}
+button:active  { transform: scale(0.95); opacity: 0.8; }
+a[href]:active { transform: scale(0.97); opacity: 0.8; }
+button:hover:not(:disabled) { filter: brightness(1.08); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Card hover lift ─────────────────────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1),
+              border-color 0.3s ease,
+              box-shadow 0.4s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  border-color: rgba(16,185,129,0.3) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 20px rgba(16,185,129,0.08);
+}
+
+/* ── Link hover underline slide ──────────────────────────────────────────── */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 2px;
+  background: var(--accent-green);
+  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+  border-radius: 2px;
+}
+.nav-link:hover::after { width: 100%; }
+
+/* ── Sidebar nav item ────────────────────────────────────────────────────── */
+.sidebar-item {
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s cubic-bezier(0.16,1,0.3,1);
+}
+.sidebar-item:hover {
+  background: rgba(16,185,129,0.07) !important;
+  transform: translateX(3px);
+}
+
+/* ── Emerald glow button pulse ───────────────────────────────────────────── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(16,185,129,0.3); }
+  50%       { box-shadow: 0 0 35px rgba(16,185,129,0.55); }
+}
+.btn-emerald {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* ── Number counter flash ────────────────────────────────────────────────── */
+@keyframes numFlash {
+  0%   { color: var(--accent-green-light); }
+  100% { color: var(--accent-green); }
+}
+
+/* ── Skeleton loading ────────────────────────────────────────────────────── */
+@keyframes shimmerLoad {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 50%, var(--bg-card) 75%);
+  background-size: 400px 100%;
+  animation: shimmerLoad 1.4s ease infinite;
+  border-radius: 6px;
+}
+
+/* ── Fade in up ──────────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+/* ── Emerald badge pulse ─────────────────────────────────────────────────── */
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent-green); }
+  50%       { opacity: 0.5; box-shadow: 0 0 2px var(--accent-green); }
+}
+.live-dot {
+  animation: badgePulse 2s infinite;
+}
+
+/* ── Modal/toast slide in ────────────────────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Smooth all interactive elements ────────────────────────────────────── */
+input, select, textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+table tr {
+  transition: background 0.15s ease;
+}
+table tr:hover td {
+  background: rgba(16,185,129,0.04);
+}
+
+/* ── Selection ────────────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(16,185,129,0.25);
+  color: #fff;
 }

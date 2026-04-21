@@ -88,12 +88,12 @@ export default function USDTDeposit() {
       </div>
 
       <div style={{
-        background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.15)',
+        background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.1)',
         borderRadius: '8px', padding: '12px', fontSize: '12px', color: 'var(--text-secondary)',
         marginBottom: '16px', lineHeight: 1.6,
       }}>
         💎 You will be redirected to NOWPayments secure page to complete your USDT payment.
-        Your balance will be credited <strong style={{ color: '#f59e0b' }}>automatically</strong> after confirmation.
+        Your balance will be credited <strong style={{ color: 'var(--accent-green)' }}>automatically</strong> after confirmation.
       </div>
 
       <button
@@ -101,7 +101,7 @@ export default function USDTDeposit() {
         disabled={loading}
         style={{
           width: '100%', padding: '13px',
-          background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #f59e0b, #d97706)',
+          background: loading ? '#4a4a6a' : 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
           border: 'none', borderRadius: '8px', color: 'white',
           fontSize: '15px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',

@@ -10,24 +10,24 @@ const METHODS = ['EasyPaisa', 'JazzCash', 'Bank Transfer']
 
 const METHOD_DETAILS: Record<string, React.ReactNode> = {
   'EasyPaisa': (
-    <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
-      <div style={{ fontWeight: 700, marginBottom: '8px', color: '#f59e0b' }}>📱 EasyPaisa Details</div>
+    <div style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
+      <div style={{ fontWeight: 700, marginBottom: '8px', color: 'var(--accent-green)' }}>📱 EasyPaisa Details</div>
       <div>Account Name: <strong>Muhammad Ahmed</strong></div>
       <div>Account Number: <strong>0300-1234567</strong></div>
       <div style={{ marginTop: '8px', color: 'var(--text-secondary)', fontSize: '12px' }}>Send the exact amount and upload a screenshot as proof.</div>
     </div>
   ),
   'JazzCash': (
-    <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
-      <div style={{ fontWeight: 700, marginBottom: '8px', color: '#f59e0b' }}>📱 JazzCash Details</div>
+    <div style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
+      <div style={{ fontWeight: 700, marginBottom: '8px', color: 'var(--accent-green)' }}>📱 JazzCash Details</div>
       <div>Account Name: <strong>Muhammad Ahmed</strong></div>
       <div>Account Number: <strong>0311-7654321</strong></div>
       <div style={{ marginTop: '8px', color: 'var(--text-secondary)', fontSize: '12px' }}>Send the exact amount and upload a screenshot as proof.</div>
     </div>
   ),
   'Bank Transfer': (
-    <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
-      <div style={{ fontWeight: 700, marginBottom: '8px', color: '#f59e0b' }}>🏦 Bank Transfer Details</div>
+    <div style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
+      <div style={{ fontWeight: 700, marginBottom: '8px', color: 'var(--accent-green)' }}>🏦 Bank Transfer Details</div>
       <div>Bank: <strong>Meezan Bank</strong></div>
       <div>Account Title: <strong>Muhammad Ahmed</strong></div>
       <div>Account Number: <strong>0123456789012345</strong></div>
@@ -36,8 +36,8 @@ const METHOD_DETAILS: Record<string, React.ReactNode> = {
     </div>
   ),
   'USDT (TRC20)': (
-    <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
-      <div style={{ fontWeight: 700, marginBottom: '8px', color: '#f59e0b' }}>💎 USDT TRC20 Wallet</div>
+    <div style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: '10px', padding: '16px', fontSize: '14px', lineHeight: 1.8 }}>
+      <div style={{ fontWeight: 700, marginBottom: '8px', color: 'var(--accent-green)' }}>💎 USDT TRC20 Wallet</div>
       <div style={{ fontFamily: 'monospace', fontSize: '13px', wordBreak: 'break-all', background: 'var(--bg-secondary)', padding: '10px', borderRadius: '6px', marginTop: '4px' }}>
         TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       </div>
@@ -59,23 +59,13 @@ export default function DepositPage() {
   const [method, setMethod] = useState('EasyPaisa')
   const [proofFile, setProofFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
-  const [deposits, setDeposits] = useState<Deposit[]>([])  
-  const [kycStatus, setKycStatus] = useState<string>('loading')
+  const [deposits, setDeposits] = useState<Deposit[]>([])
   const [activeTab, setActiveTab] = useState('USDT (Auto)')
   const supabase = createClient()
 
   useEffect(() => {
     fetchDeposits()
-    checkKyc()
   }, [])
-
-  async function checkKyc() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    const { data } = await supabase.from('profiles').select('kyc_status, is_admin').eq('id', user.id).single()
-    if (data?.is_admin) { setKycStatus('verified'); return }
-    setKycStatus(data?.kyc_status || 'none')
-  }
 
   async function fetchDeposits() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -98,28 +88,17 @@ export default function DepositPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setLoading(false); return toast.error('Not logged in') }
 
-    // Upload proof
-    const fileName = `${user.id}/${Date.now()}-${proofFile.name}`
-    const { error: uploadError } = await supabase.storage
-      .from('deposit-proofs')
-      .upload(fileName, proofFile)
+    const form = new FormData()
+    form.append('userId', user.id)
+    form.append('amount', String(amt))
+    form.append('method', method)
+    form.append('proof', proofFile)
 
-    let proofUrl = ''
-    if (!uploadError) {
-      const { data: urlData } = supabase.storage.from('deposit-proofs').getPublicUrl(fileName)
-      proofUrl = urlData.publicUrl
-    }
-
-    const { error } = await supabase.from('deposits').insert({
-      user_id: user.id,
-      amount: amt,
-      method,
-      proof_url: proofUrl,
-      status: 'pending',
-    })
-
+    const res = await fetch('/api/deposits/upload-proof', { method: 'POST', body: form })
+    const data = await res.json()
     setLoading(false)
-    if (error) return toast.error('Failed to submit deposit request')
+
+    if (!res.ok) return toast.error(data.error || 'Failed to submit deposit')
     toast.success('Deposit request submitted! We will verify within 24 hours.')
     setAmount('')
     setProofFile(null)
@@ -128,7 +107,7 @@ export default function DepositPage() {
 
   function statusBadge(status: string) {
     const map: Record<string, { color: string; bg: string; icon: React.ReactNode }> = {
-      pending: { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', icon: <Clock size={12} /> },
+      pending: { color: 'var(--accent-green)', bg: 'rgba(16,185,129,0.1)', icon: <Clock size={12} /> },
       approved: { color: 'var(--accent-green)', bg: 'rgba(0,212,160,0.15)', icon: <CheckCircle size={12} /> },
       rejected: { color: 'var(--accent-red)', bg: 'rgba(255,68,68,0.15)', icon: <XCircle size={12} /> },
     }
@@ -141,33 +120,6 @@ export default function DepositPage() {
       }}>
         {s.icon} {status.toUpperCase()}
       </span>
-    )
-  }
-
-  if (kycStatus !== 'loading' && kycStatus !== 'verified') {
-    return (
-      <div style={{ padding: '32px', maxWidth: '600px' }}>
-        <div style={{
-          background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)',
-          borderRadius: '16px', padding: '40px', textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
-          <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '8px', color: '#f59e0b' }}>KYC Verification Required</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
-            {kycStatus === 'pending'
-              ? 'Your KYC is under review. Deposits will be unlocked once verified (usually within minutes).'
-              : 'You need to complete identity verification before making deposits.'}
-          </p>
-          {kycStatus !== 'pending' && (
-            <a href="/dashboard/kyc" style={{
-              display: 'inline-block', padding: '12px 28px',
-              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-              borderRadius: '8px', color: 'white', textDecoration: 'none',
-              fontSize: '14px', fontWeight: 700,
-            }}>Complete KYC Now →</a>
-          )}
-        </div>
-      </div>
     )
   }
 
@@ -184,7 +136,7 @@ export default function DepositPage() {
           <button key={tab} onClick={() => setActiveTab(tab)} style={{
             padding: '8px 18px', borderRadius: '8px', cursor: 'pointer',
             fontSize: '13px', fontWeight: 600,
-            background: activeTab === tab ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'var(--bg-card)',
+            background: activeTab === tab ? 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))' : 'var(--bg-card)',
             color: activeTab === tab ? 'white' : 'var(--text-secondary)',
             border: activeTab === tab ? 'none' : '1px solid var(--border)',
           }}>{tab}</button>
@@ -275,7 +227,7 @@ export default function DepositPage() {
             disabled={loading}
             style={{
               width: '100%', padding: '13px',
-              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #f59e0b, #d97706)',
+              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
               border: 'none', borderRadius: '8px', color: 'white',
               fontSize: '15px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
             }}
@@ -298,11 +250,11 @@ export default function DepositPage() {
           <div style={{
             marginTop: '16px',
             padding: '12px',
-            background: 'rgba(245,158,11,0.08)',
-            border: '1px solid rgba(245,158,11,0.2)',
+            background: 'rgba(16,185,129,0.07)',
+            border: '1px solid rgba(16,185,129,0.15)',
             borderRadius: '8px',
             fontSize: '12px',
-            color: '#f59e0b',
+            color: 'var(--accent-green)',
           }}>
             ⚠️ Deposits are verified within 24 hours. Your balance will be updated once confirmed.
           </div>

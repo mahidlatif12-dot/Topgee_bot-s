@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { sendEmail } from '@/lib/email'
 
 export async function POST(req: Request) {
   try {
@@ -13,8 +14,13 @@ export async function POST(req: Request) {
       .eq('id', withdrawalId)
     if (wdError) throw wdError
 
-    // Deduct from user balance
-    const { data: profile } = await supabase.from('profiles').select('balance, total_withdrawn').eq('id', userId).single()
+    // Get user profile
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('balance, total_withdrawn, email, full_name')
+      .eq('id', userId)
+      .single()
+
     const newBalance = Math.max(0, (profile?.balance || 0) - amount)
     const newWithdrawn = (profile?.total_withdrawn || 0) + amount
 
@@ -31,6 +37,15 @@ export async function POST(req: Request) {
       amount,
       description: 'Withdrawal processed',
     })
+
+    // Send email notification
+    if (profile?.email) {
+      await sendEmail({
+        to: profile.email,
+        template: 'withdrawal_approved',
+        data: { name: profile.full_name || 'Investor', amount: amount.toFixed(2) },
+      })
+    }
 
     return NextResponse.json({ success: true })
   } catch (e) {

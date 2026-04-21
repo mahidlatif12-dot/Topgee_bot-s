@@ -74,8 +74,8 @@ export default function WithdrawPage() {
 
   function statusBadge(status: string) {
     const map: Record<string, { color: string; bg: string; icon: React.ReactNode; label: string }> = {
-      pending: { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', icon: <Clock size={12} />, label: 'PENDING' },
-      processing: { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', icon: <Clock size={12} />, label: 'PROCESSING' },
+      pending: { color: 'var(--accent-green)', bg: 'rgba(16,185,129,0.1)', icon: <Clock size={12} />, label: 'PENDING' },
+      processing: { color: 'var(--accent-green)', bg: 'rgba(16,185,129,0.1)', icon: <Clock size={12} />, label: 'PROCESSING' },
       paid: { color: 'var(--accent-green)', bg: 'rgba(0,212,160,0.15)', icon: <CheckCircle size={12} />, label: 'PAID' },
       rejected: { color: 'var(--accent-red)', bg: 'rgba(255,68,68,0.15)', icon: <XCircle size={12} />, label: 'REJECTED' },
     }
@@ -102,11 +102,11 @@ export default function WithdrawPage() {
     return (
       <div style={{ padding: '32px', maxWidth: '600px' }}>
         <div style={{
-          background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)',
+          background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.2)',
           borderRadius: '16px', padding: '40px', textAlign: 'center',
         }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
-          <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '8px', color: '#f59e0b' }}>KYC Verification Required</h2>
+          <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '8px', color: 'var(--accent-green)' }}>KYC Verification Required</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
             {kycStatus === 'pending'
               ? 'Your KYC is under review. Withdrawals will be unlocked once verified.'
@@ -115,7 +115,7 @@ export default function WithdrawPage() {
           {kycStatus !== 'pending' && (
             <a href="/dashboard/kyc" style={{
               display: 'inline-block', padding: '12px 28px',
-              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              background: 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
               borderRadius: '8px', color: 'white', textDecoration: 'none',
               fontSize: '14px', fontWeight: 700,
             }}>Complete KYC Now →</a>
@@ -134,7 +134,7 @@ export default function WithdrawPage() {
 
       {/* Balance Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(0,212,160,0.15), rgba(245,158,11,0.1))',
+        background: 'linear-gradient(135deg, rgba(0,212,160,0.15), rgba(16,185,129,0.08))',
         border: '1px solid rgba(0,212,160,0.3)',
         borderRadius: '12px',
         padding: '20px 24px',
@@ -185,7 +185,7 @@ export default function WithdrawPage() {
                 marginTop: '6px',
                 background: 'none',
                 border: 'none',
-                color: '#f59e0b',
+                color: 'var(--accent-green)',
                 fontSize: '12px',
                 cursor: 'pointer',
                 padding: 0,
@@ -236,7 +236,7 @@ export default function WithdrawPage() {
             disabled={loading}
             style={{
               width: '100%', padding: '13px',
-              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #f59e0b, #d97706)',
+              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
               border: 'none', borderRadius: '8px', color: 'white',
               fontSize: '15px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
             }}

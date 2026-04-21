@@ -1,17 +1,11 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { sendEmail } from '@/lib/email'
 
 export async function POST(req: Request) {
   try {
     const { depositId, userId, amount } = await req.json()
     const supabase = await createAdminClient()
-
-    // Check caller is admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-      if (!profile?.is_admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
 
     // Update deposit status
     const { error: depError } = await supabase
@@ -21,7 +15,11 @@ export async function POST(req: Request) {
     if (depError) throw depError
 
     // Get current user profile
-    const { data: profile } = await supabase.from('profiles').select('balance, total_deposited').eq('id', userId).single()
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('balance, total_deposited, email, full_name')
+      .eq('id', userId)
+      .single()
     const newBalance = (profile?.balance || 0) + amount
     const newDeposited = (profile?.total_deposited || 0) + amount
 
@@ -39,6 +37,15 @@ export async function POST(req: Request) {
       amount,
       description: `Deposit approved`,
     })
+
+    // Send email notification
+    if (profile?.email) {
+      await sendEmail({
+        to: profile.email,
+        template: 'deposit_approved',
+        data: { name: profile.full_name || 'Investor', amount: amount.toFixed(2) },
+      })
+    }
 
     return NextResponse.json({ success: true })
   } catch (e) {

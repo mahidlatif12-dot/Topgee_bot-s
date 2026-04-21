@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, LogIn } from 'lucide-react'
+import { Eye, EyeOff, LogIn, Mail, ArrowRight } from 'lucide-react'
 
 function GoogleIcon() {
   return (
@@ -18,7 +18,10 @@ function GoogleIcon() {
   )
 }
 
+type LoginMode = 'password' | 'otp-request' | 'otp-verify'
+
 export default function LoginPage() {
+  const [mode, setMode] = useState<LoginMode>('password')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
@@ -27,23 +30,47 @@ export default function LoginPage() {
   const supabase = createClient()
 
   async function handleGoogle() {
-    const supabase = createClient()
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: 'https://topgeecapital.com/auth/callback' },
     })
   }
 
-  async function handleLogin(e: React.FormEvent) {
+  // Standard password login
+  async function handlePasswordLogin(e: React.FormEvent) {
     e.preventDefault()
     if (!email || !password) return toast.error('Please fill in all fields')
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
-    if (error) return toast.error(error.message)
+    if (error) {
+      // If email not confirmed, send OTP and redirect to verify
+      if (error.message.toLowerCase().includes('email not confirmed')) {
+        toast('Please verify your email first.', { icon: '📧' })
+        await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } })
+        router.push(`/auth/verify-email?email=${encodeURIComponent(email)}&type=login`)
+        return
+      }
+      return toast.error(error.message)
+    }
     toast.success('Welcome back!')
     router.push('/dashboard')
     router.refresh()
+  }
+
+  // Send OTP for magic code login
+  async function handleSendOtp(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email) return toast.error('Enter your email address')
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false },
+    })
+    setLoading(false)
+    if (error) return toast.error(error.message)
+    toast.success('Code sent! Check your email.')
+    router.push(`/auth/verify-email?email=${encodeURIComponent(email)}&type=login`)
   }
 
   return (
@@ -59,135 +86,160 @@ export default function LoginPage() {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '28px' }}>🤖</span>
+            <img src='/logo.jpeg' alt='Topgee Capital' style={{ width: '60px', height: '60px', borderRadius: '14px', objectFit: 'cover' }} />
             <span style={{
-              fontSize: '22px',
-              fontWeight: 800,
-              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              fontSize: '22px', fontWeight: 800,
+              background: 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             }}>Topgee Capital</span>
           </Link>
           <p style={{ color: 'var(--text-secondary)', marginTop: '8px', fontSize: '14px' }}>Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleLogin} style={{
+        {/* Tab switcher */}
+        <div style={{
+          display: 'flex', background: 'var(--bg-card)',
+          border: '1px solid var(--border)', borderRadius: '12px',
+          padding: '4px', marginBottom: '16px', gap: '4px',
+        }}>
+          {[
+            { key: 'password', label: '🔑 Password' },
+            { key: 'otp-request', label: '📧 Email Code' },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setMode(tab.key as LoginMode)}
+              style={{
+                flex: 1, padding: '10px 8px', border: 'none', borderRadius: '8px',
+                fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                background: mode === tab.key ? 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))' : 'transparent',
+                color: mode === tab.key ? 'white' : 'var(--text-secondary)',
+                transition: 'all 0.2s',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{
           background: 'var(--bg-card)',
           border: '1px solid var(--border)',
           borderRadius: '16px',
           padding: '32px',
         }}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-secondary)' }}>
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border)',
-                borderRadius: '8px',
-                color: 'var(--text-primary)',
-                fontSize: '15px',
-                outline: 'none',
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-secondary)' }}>
-              Password
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type={showPass ? 'text' : 'password'}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                style={{
-                  width: '100%',
-                  padding: '12px 48px 12px 16px',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '8px',
-                  color: 'var(--text-primary)',
-                  fontSize: '15px',
-                  outline: 'none',
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--text-secondary)',
-                  display: 'flex',
-                }}
-              >
-                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+          {/* PASSWORD LOGIN */}
+          {mode === 'password' && (
+            <form onSubmit={handlePasswordLogin}>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-secondary)' }}>
+                  Email Address
+                </label>
+                <input
+                  type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com" required
+                  style={{
+                    width: '100%', padding: '12px 16px',
+                    background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '15px', outline: 'none',
+                  }}
+                />
+              </div>
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-secondary)' }}>
+                  Password
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPass ? 'text' : 'password'} value={password}
+                    onChange={e => setPassword(e.target.value)} placeholder="••••••••" required
+                    style={{
+                      width: '100%', padding: '12px 48px 12px 16px',
+                      background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+                      borderRadius: '8px', color: 'var(--text-primary)', fontSize: '15px', outline: 'none',
+                    }}
+                  />
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{
+                    position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex',
+                  }}>
+                    {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <button type="submit" disabled={loading} style={{
+                width: '100%', padding: '13px',
+                background: loading ? '#4a4a6a' : 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
+                border: 'none', borderRadius: '8px', color: 'white',
+                fontSize: '15px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              }}>
+                {loading ? 'Signing in...' : <><LogIn size={18} /> Sign In</>}
               </button>
-            </div>
-          </div>
+            </form>
+          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '13px',
-              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #f59e0b, #d97706)',
-              border: 'none',
-              borderRadius: '8px',
-              color: 'white',
-              fontSize: '15px',
-              fontWeight: 700,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-            }}
-          >
-            {loading ? 'Signing in...' : <><LogIn size={18} /> Sign In</>}
-          </button>
+          {/* OTP / MAGIC CODE LOGIN */}
+          {mode === 'otp-request' && (
+            <form onSubmit={handleSendOtp}>
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <div style={{
+                  width: '56px', height: '56px', borderRadius: '50%',
+                  background: 'rgba(16,185,129,0.12)', border: '2px solid rgba(16,185,129,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px',
+                }}>
+                  <Mail size={24} color="var(--accent-green)" />
+                </div>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+                  We&apos;ll send a 6-digit code to your email. No password needed.
+                </p>
+              </div>
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-secondary)' }}>
+                  Email Address
+                </label>
+                <input
+                  type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com" required autoFocus
+                  style={{
+                    width: '100%', padding: '12px 16px',
+                    background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '15px', outline: 'none',
+                  }}
+                />
+              </div>
+              <button type="submit" disabled={loading} style={{
+                width: '100%', padding: '13px',
+                background: loading ? '#4a4a6a' : 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
+                border: 'none', borderRadius: '8px', color: 'white',
+                fontSize: '15px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              }}>
+                {loading ? 'Sending...' : <><ArrowRight size={18} /> Send Code</>}
+              </button>
+            </form>
+          )}
 
+          {/* Divider + Google */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '20px 0' }}>
             <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
             <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>or</span>
             <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
           </div>
-
-          <button
-            type="button"
-            onClick={handleGoogle}
-            style={{
-              width: '100%', padding: '12px',
-              background: 'var(--bg-secondary)', border: '1px solid var(--border)',
-              borderRadius: '8px', color: 'var(--text-primary)',
-              fontSize: '14px', fontWeight: 600, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-            }}
-          >
+          <button type="button" onClick={handleGoogle} style={{
+            width: '100%', padding: '12px',
+            background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+            borderRadius: '8px', color: 'var(--text-primary)',
+            fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+          }}>
             <GoogleIcon /> Continue with Google
           </button>
-        </form>
+        </div>
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px' }}>
           Don&apos;t have an account?{' '}
-          <Link href="/auth/signup" style={{ color: '#f59e0b', fontWeight: 600, textDecoration: 'none' }}>
+          <Link href="/auth/signup" style={{ color: 'var(--accent-green)', fontWeight: 600, textDecoration: 'none' }}>
             Sign up free
           </Link>
         </p>

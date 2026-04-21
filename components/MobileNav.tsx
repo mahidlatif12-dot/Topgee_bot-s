@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutDashboard, ArrowDownCircle, ArrowUpCircle, ShieldCheck, Settings, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, ArrowDownCircle, ArrowUpCircle, ShieldCheck, Settings, LogOut, Menu, X, UserCircle, HeadphonesIcon, Gift } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useState, useEffect } from 'react'
 
@@ -44,7 +44,13 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
     { href: '/dashboard/deposit', label: 'Deposit', icon: <ArrowDownCircle size={20} /> },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: <ArrowUpCircle size={20} /> },
     { href: '/dashboard/kyc', label: 'KYC', icon: <ShieldCheck size={20} /> },
+    { href: '/dashboard/referral', label: 'Referral', icon: <Gift size={20} /> },
+    { href: '/dashboard/support', label: 'Support', icon: <HeadphonesIcon size={20} /> },
+    { href: '/dashboard/profile', label: 'Profile', icon: <UserCircle size={20} /> },
   ]
+
+  // Bottom tab bar shows only 4 items (most important)
+  const bottomTabs = navItems.slice(0, 4)
 
   return (
     <>
@@ -56,11 +62,10 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
       }}>
         <Link href="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '20px' }}>🤖</span>
+          <img src='/logo.jpeg' alt='Topgee Capital' style={{ width: '38px', height: '38px', borderRadius: '9px', objectFit: 'cover', flexShrink: 0 }} />
           <span style={{
             fontSize: '16px', fontWeight: 800,
-            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            color: 'var(--text-primary)', letterSpacing: '-0.3px',
           }}>Topgee Capital</span>
         </Link>
         <button onClick={() => setMenuOpen(!menuOpen)} style={{
@@ -82,7 +87,21 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
           <div style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
             borderRadius: '12px', padding: '16px', marginBottom: '16px',
+            display: 'flex', alignItems: 'center', gap: '12px',
           }}>
+            <div style={{
+              width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0,
+              background: (profile as any)?.avatar_url ? 'transparent' : 'var(--accent-green)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '18px', fontWeight: 800, color: '#000',
+              overflow: 'hidden', border: '2px solid rgba(245,158,11,0.4)',
+            }}>
+              {(profile as any)?.avatar_url
+                ? <img src={(profile as any).avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : (profile?.full_name || '?')[0].toUpperCase()
+              }
+            </div>
+            <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: '15px' }}>{profile?.full_name || '...'}</div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
               Balance: <span style={{ color: 'var(--accent-green)', fontWeight: 600 }}>${(profile?.balance || 0).toFixed(2)}</span>
@@ -91,10 +110,11 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
               <span style={{
                 fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '100px',
                 background: profile?.kyc_status === 'verified' ? 'rgba(0,212,160,0.15)' : 'rgba(245,158,11,0.15)',
-                color: profile?.kyc_status === 'verified' ? 'var(--accent-green)' : '#f59e0b',
+                color: profile?.kyc_status === 'verified' ? 'var(--accent-green)' : 'var(--accent-green-light)',
               }}>
                 {profile?.kyc_status === 'verified' ? '✅ KYC Verified' : '⚠️ KYC Required'}
               </span>
+            </div>
             </div>
           </div>
 
@@ -107,8 +127,8 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
                   display: 'flex', alignItems: 'center', gap: '12px',
                   padding: '14px 16px', borderRadius: '10px', textDecoration: 'none',
                   fontSize: '15px', fontWeight: active ? 600 : 400,
-                  color: active ? '#f59e0b' : 'var(--text-primary)',
-                  background: active ? 'rgba(245,158,11,0.12)' : 'var(--bg-card)',
+                  color: active ? 'var(--accent-green)' : 'var(--text-primary)',
+                  background: active ? 'rgba(16,185,129,0.1)' : 'var(--bg-card)',
                   border: '1px solid var(--border)',
                 }}>
                   {item.icon} {item.label}
@@ -141,26 +161,36 @@ export default function MobileNav({ profile: initialProfile }: { profile: Profil
         </div>
       )}
 
-      {/* Bottom Tab Bar */}
+      {/* Bottom Tab Bar — 4 main tabs + menu */}
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0,
         background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)',
         display: 'flex', zIndex: 100, paddingBottom: 'env(safe-area-inset-bottom)',
       }}>
-        {navItems.map(item => {
+        {bottomTabs.map(item => {
           const active = pathname === item.href
           return (
             <Link key={item.href} href={item.href} style={{
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
               padding: '10px 4px 8px', textDecoration: 'none', gap: '3px',
-              color: active ? '#f59e0b' : 'var(--text-secondary)',
-              borderTop: active ? '2px solid #f59e0b' : '2px solid transparent',
+              color: active ? 'var(--accent-green)' : 'var(--text-secondary)',
+              borderTop: active ? '2px solid var(--accent-green)' : '2px solid transparent',
             }}>
               {item.icon}
               <span style={{ fontSize: '10px', fontWeight: active ? 600 : 400 }}>{item.label}</span>
             </Link>
           )
         })}
+        {/* More button opens slide menu */}
+        <button onClick={() => setMenuOpen(!menuOpen)} style={{
+          flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+          padding: '10px 4px 8px', gap: '3px', background: 'none', border: 'none',
+          color: menuOpen ? 'var(--accent-green)' : 'var(--text-secondary)', cursor: 'pointer',
+          borderTop: menuOpen ? '2px solid var(--accent-green)' : '2px solid transparent',
+        }}>
+          <Menu size={20} />
+          <span style={{ fontSize: '10px', fontWeight: menuOpen ? 600 : 400 }}>More</span>
+        </button>
       </div>
     </>
   )

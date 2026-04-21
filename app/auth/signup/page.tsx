@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -25,8 +25,18 @@ export default function SignupPage() {
   const [confirm, setConfirm] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [refCode, setRefCode] = useState('')
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    // Pre-fill referral code from URL or localStorage
+    const params = new URLSearchParams(window.location.search)
+    const urlRef = params.get('ref')
+    const storedRef = localStorage.getItem('ref_code')
+    if (urlRef) setRefCode(urlRef)
+    else if (storedRef) setRefCode(storedRef)
+  }, [])
 
   async function handleGoogle() {
     const supabase = createClient()
@@ -43,18 +53,25 @@ export default function SignupPage() {
     if (password.length < 6) return toast.error('Password must be at least 6 characters')
 
     setLoading(true)
+
+    // Step 1: Create the account with password
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: undefined, // we handle OTP ourselves
+      },
     })
     if (error) {
       setLoading(false)
       return toast.error(error.message)
     }
 
-    // Create profile row
+    // Step 2: Create profile row with referral code
     if (data.user) {
+      const newCode = (fullName.split(' ')[0].toUpperCase().slice(0, 6) + Math.random().toString(36).substring(2, 6).toUpperCase())
+
       await supabase.from('profiles').upsert({
         id: data.user.id,
         full_name: fullName,
@@ -64,13 +81,36 @@ export default function SignupPage() {
         total_withdrawn: 0,
         total_profit: 0,
         is_admin: false,
+        referral_code: newCode,
+        referral_balance: 0,
+        referred_by: refCode.trim().toUpperCase() || null,
       })
+
+      if (refCode.trim()) {
+        const { data: referrer } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('referral_code', refCode.trim().toUpperCase())
+          .single()
+
+        if (referrer) {
+          await supabase.from('referrals').insert({
+            referrer_id: referrer.id,
+            referred_id: data.user.id,
+            commission_earned: 0,
+          })
+        }
+      }
+
+      localStorage.removeItem('ref_code')
     }
 
     setLoading(false)
-    toast.success('Account created! Welcome to Topgee Capital.')
-    router.push('/dashboard')
-    router.refresh()
+
+    // If email already confirmed (e.g. Supabase auto-confirm disabled), go to verify
+    // Otherwise redirect to verify page with email
+    toast.success('Account created! Check your email for the verification code.')
+    router.push(`/auth/verify-email?email=${encodeURIComponent(email)}&type=signup`)
   }
 
   return (
@@ -85,11 +125,11 @@ export default function SignupPage() {
       <div style={{ width: '100%', maxWidth: '420px' }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '28px' }}>🤖</span>
+            <img src='/logo.jpeg' alt='Topgee Capital' style={{ width: '60px', height: '60px', borderRadius: '14px', objectFit: 'cover' }} />
             <span style={{
               fontSize: '22px',
               fontWeight: 800,
-              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              background: 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>Topgee Capital</span>
@@ -162,7 +202,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-secondary)' }}>
               Confirm Password
             </label>
@@ -185,13 +225,51 @@ export default function SignupPage() {
             />
           </div>
 
+          {/* Referral Code */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-secondary)' }}>
+              🔗 Referral Code <span style={{ fontWeight: 400, color: 'var(--text-secondary)', fontSize: '11px' }}>(optional)</span>
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                value={refCode}
+                onChange={e => setRefCode(e.target.value.toUpperCase())}
+                placeholder="e.g. AHMED1K2"
+                maxLength={12}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: refCode ? 'rgba(16,185,129,0.07)' : 'var(--bg-secondary)',
+                  border: refCode ? '1px solid rgba(16,185,129,0.3)' : '1px solid var(--border)',
+                  borderRadius: '8px',
+                  color: refCode ? 'var(--accent-green)' : 'var(--text-primary)',
+                  fontSize: '15px', outline: 'none',
+                  fontFamily: 'monospace', letterSpacing: '2px', fontWeight: refCode ? 700 : 400,
+                  transition: 'all 0.2s',
+                }}
+              />
+              {refCode && (
+                <div style={{
+                  position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+                  fontSize: '11px', color: '#22c55e', fontWeight: 700,
+                }}>✓ Applied</div>
+              )}
+            </div>
+            {refCode && (
+              <p style={{ fontSize: '11px', color: '#22c55e', marginTop: '6px' }}>
+                🎉 Referral code applied! Your friend will earn 0.5% of your deposits.
+              </p>
+            )}
+          </div>
+
           <button
             type="submit"
             disabled={loading}
             style={{
               width: '100%',
               padding: '13px',
-              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, #f59e0b, #d97706)',
+              background: loading ? '#4a4a6a' : 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
               border: 'none',
               borderRadius: '8px',
               color: 'white',
@@ -230,7 +308,7 @@ export default function SignupPage() {
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px' }}>
           Already have an account?{' '}
-          <Link href="/auth/login" style={{ color: '#f59e0b', fontWeight: 600, textDecoration: 'none' }}>
+          <Link href="/auth/login" style={{ color: 'var(--accent-green)', fontWeight: 600, textDecoration: 'none' }}>
             Sign in
           </Link>
         </p>

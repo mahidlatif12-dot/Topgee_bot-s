@@ -79,7 +79,7 @@ export default function RealtimeDashboard({ userId, initialProfile, initialTrans
       }}>
         {[
           { label: 'Current Balance', value: `$${balance.toFixed(2)}`, color: 'var(--accent-green)', bg: 'rgba(0,212,160,0.1)' },
-          { label: 'Total Deposited', value: `$${deposited.toFixed(2)}`, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+          { label: 'Total Deposited', value: `$${deposited.toFixed(2)}`, color: 'var(--accent-green)', bg: 'rgba(16,185,129,0.08)' },
           { label: 'Total Profit', value: `$${profit.toFixed(2)}`, color: 'var(--accent-green)', bg: 'rgba(0,212,160,0.1)' },
           { label: 'ROI', value: `${roi}%`, color: Number(roi) >= 0 ? 'var(--accent-green)' : 'var(--accent-red)', bg: Number(roi) >= 0 ? 'rgba(0,212,160,0.1)' : 'rgba(255,68,68,0.1)' },
         ].map((card, i) => (
@@ -130,8 +130,8 @@ export default function RealtimeDashboard({ userId, initialProfile, initialTrans
                     <td style={{ padding: '12px' }}>
                       <span style={{
                         padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
-                        background: tx.type === 'deposit' ? 'rgba(245,158,11,0.15)' : tx.type === 'profit' ? 'rgba(0,212,160,0.15)' : 'rgba(255,68,68,0.15)',
-                        color: tx.type === 'deposit' ? '#f59e0b' : tx.type === 'profit' ? 'var(--accent-green)' : 'var(--accent-red)',
+                        background: tx.type === 'deposit' ? 'rgba(16,185,129,0.1)' : tx.type === 'profit' ? 'rgba(0,212,160,0.15)' : 'rgba(255,68,68,0.15)',
+                        color: tx.type === 'deposit' ? 'var(--accent-green)' : tx.type === 'profit' ? 'var(--accent-green)' : 'var(--accent-red)',
                       }}>
                         {tx.type.toUpperCase()}
                       </span>

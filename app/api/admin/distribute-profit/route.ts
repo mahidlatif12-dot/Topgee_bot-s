@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { sendEmail } from '@/lib/email'
 
 export async function POST(req: Request) {
   try {
@@ -9,7 +10,7 @@ export async function POST(req: Request) {
     // Get all non-admin users with balance > 0
     const { data: users, error: fetchErr } = await supabase
       .from('profiles')
-      .select('id, balance, total_profit')
+      .select('id, balance, total_profit, email, full_name')
       .eq('is_admin', false)
       .gt('balance', 0)
     if (fetchErr) throw fetchErr
@@ -27,13 +28,24 @@ export async function POST(req: Request) {
         total_profit: newProfit,
       }).eq('id', user.id)
 
-      // Add transaction
       await supabase.from('transactions').insert({
         user_id: user.id,
         type: 'profit',
         amount: profitAmount,
         description: `${profitPct}% profit distribution`,
       })
+
+      // Send email notification
+      if (user.email) {
+        await sendEmail({
+          to: user.email,
+          template: 'profit_distributed',
+          data: {
+            name: user.full_name || 'Investor',
+            amount: profitAmount.toFixed(2),
+          },
+        })
+      }
     }
 
     return NextResponse.json({ success: true, usersUpdated: users?.length || 0 })

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutDashboard, ArrowDownCircle, ArrowUpCircle, LogOut, Settings, ShieldCheck } from 'lucide-react'
+import { LayoutDashboard, ArrowDownCircle, ArrowUpCircle, LogOut, Settings, ShieldCheck, UserCircle, HeadphonesIcon, Gift } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 
@@ -46,6 +46,9 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
     { href: '/dashboard/deposit', label: 'Deposit', icon: <ArrowDownCircle size={18} /> },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: <ArrowUpCircle size={18} /> },
     { href: '/dashboard/kyc', label: 'KYC Verification', icon: <ShieldCheck size={18} /> },
+    { href: '/dashboard/profile', label: 'Profile', icon: <UserCircle size={18} /> },
+    { href: '/dashboard/referral', label: 'Referral', icon: <Gift size={18} /> },
+    { href: '/dashboard/support', label: 'Support', icon: <HeadphonesIcon size={18} /> },
   ]
 
   return (
@@ -62,14 +65,15 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
       zIndex: 50,
     }}>
       {/* Logo */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '22px' }}>🤖</span>
-          <span style={{
-            fontSize: '18px', fontWeight: 800,
-            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          }}>Topgee Capital</span>
+      <div style={{ padding: '18px 20px 16px', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src='/logo.jpeg' alt='Topgee Capital' style={{ width: '40px', height: '40px', borderRadius: '10px', objectFit: 'cover', boxShadow: '0 0 14px rgba(16,185,129,0.25)' }} />
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+              Topgee<span style={{ color: 'var(--accent-green)' }}>.</span>
+            </div>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Capital</div>
+          </div>
         </div>
       </div>
 
@@ -78,13 +82,13 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
         {navItems.map(item => {
           const active = pathname === item.href
           return (
-            <Link key={item.href} href={item.href} style={{
+            <Link key={item.href} href={item.href} className="sidebar-item" style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               padding: '10px 12px', borderRadius: '8px', marginBottom: '4px',
               textDecoration: 'none', fontSize: '14px',
               fontWeight: active ? 600 : 400,
-              color: active ? '#f59e0b' : 'var(--text-secondary)',
-              background: active ? 'rgba(245,158,11,0.12)' : 'transparent',
+              color: active ? 'var(--accent-green)' : 'var(--text-secondary)',
+              background: active ? 'rgba(16,185,129,0.1)' : 'transparent',
             }}>
               {item.icon} {item.label}
             </Link>
@@ -97,8 +101,8 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
             padding: '10px 12px', borderRadius: '8px', marginTop: '8px',
             textDecoration: 'none', fontSize: '14px',
             fontWeight: pathname.startsWith('/admin') ? 600 : 400,
-            color: pathname.startsWith('/admin') ? '#f59e0b' : 'var(--text-secondary)',
-            background: pathname.startsWith('/admin') ? 'rgba(245,158,11,0.12)' : 'transparent',
+            color: pathname.startsWith('/admin') ? 'var(--accent-green)' : 'var(--text-secondary)',
+            background: pathname.startsWith('/admin') ? 'rgba(16,185,129,0.1)' : 'transparent',
           }}>
             <Settings size={18} /> Admin Panel
           </Link>
@@ -108,8 +112,14 @@ export default function Sidebar({ profile: initialProfile }: { profile: Profile 
       {/* User + Logout */}
       <div style={{ padding: '16px', borderTop: '1px solid var(--border)' }}>
         <div style={{ marginBottom: '12px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
-            {profile?.full_name || '...'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            {(profile as any)?.avatar_url
+              ? <img src={(profile as any).avatar_url} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(245,158,11,0.4)' }} />
+              : <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800, color: '#000', flexShrink: 0 }}>{(profile?.full_name || profile?.email || '?')[0].toUpperCase()}</div>
+            }
+            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+              {profile?.full_name || '...'}
+            </div>
           </div>
           <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>
             Balance: <span style={{ color: 'var(--accent-green)', fontWeight: 600 }}>

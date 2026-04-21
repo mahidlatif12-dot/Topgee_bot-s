@@ -24,16 +24,25 @@ export default function WithdrawPage() {
   const [balance, setBalance] = useState(0)
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([])
   const [kycStatus, setKycStatus] = useState<string>('loading')
+  const [emailVerified, setEmailVerified] = useState(false)
+  const [twoFaEnabled, setTwoFaEnabled] = useState(false)
+  const [securityLoading, setSecurityLoading] = useState(true)
   const supabase = createClient()
 
-  useEffect(() => { loadData(); checkKyc() }, [])
+  useEffect(() => { loadData(); checkSecurity() }, [])
 
-  async function checkKyc() {
+  async function checkSecurity() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('profiles').select('kyc_status, is_admin').eq('id', user.id).single()
-    if (data?.is_admin) { setKycStatus('verified'); return }
+    setEmailVerified(!!user.email_confirmed_at)
+    const { data } = await supabase.from('profiles').select('kyc_status, is_admin, two_fa_enabled').eq('id', user.id).single()
+    if (data?.is_admin) { setKycStatus('verified'); setTwoFaEnabled(true); setEmailVerified(true); setSecurityLoading(false); return }
     setKycStatus(data?.kyc_status || 'none')
+    // Check TOTP
+    const { data: mfaData } = await supabase.auth.mfa.listFactors()
+    const hasTotp = mfaData?.totp?.some(f => f.status === 'verified') || data?.two_fa_enabled || false
+    setTwoFaEnabled(hasTotp)
+    setSecurityLoading(false)
   }
 
   async function loadData() {
@@ -98,31 +107,50 @@ export default function WithdrawPage() {
     'USDT (TRC20)': 'Your TRC20 USDT wallet address',
   }
 
-  if (kycStatus !== 'loading' && kycStatus !== 'verified') {
-    return (
-      <div style={{ padding: '32px', maxWidth: '600px' }}>
-        <div style={{
-          background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.2)',
-          borderRadius: '16px', padding: '40px', textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
-          <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '8px', color: 'var(--accent-green)' }}>KYC Verification Required</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
-            {kycStatus === 'pending'
-              ? 'Your KYC is under review. Withdrawals will be unlocked once verified.'
-              : 'You need to complete identity verification before making withdrawals.'}
-          </p>
-          {kycStatus !== 'pending' && (
-            <a href="/dashboard/kyc" style={{
-              display: 'inline-block', padding: '12px 28px',
-              background: 'linear-gradient(135deg, var(--accent-green), var(--accent-green-dark))',
-              borderRadius: '8px', color: 'white', textDecoration: 'none',
-              fontSize: '14px', fontWeight: 700,
-            }}>Complete KYC Now →</a>
-          )}
+  // Security gate — all 3 must be complete
+  if (!securityLoading) {
+    const steps = [
+      { done: emailVerified, label: 'Email Verified', desc: 'Verify your email address first', link: '/auth/verify-email?type=login&email=', linkLabel: 'Verify Email' },
+      { done: kycStatus === 'verified', label: 'KYC Verified', desc: kycStatus === 'pending' ? 'Your KYC is under review — please wait' : 'Complete identity verification first', link: '/dashboard/kyc', linkLabel: 'Complete KYC' },
+      { done: twoFaEnabled, label: 'Google Authenticator (2FA)', desc: 'Set up 2FA on your profile first', link: '/dashboard/profile?tab=security', linkLabel: 'Set Up 2FA' },
+    ]
+    const allDone = steps.every(s => s.done)
+
+    if (!allDone) {
+      return (
+        <div style={{ padding: 'clamp(16px,4vw,32px)', maxWidth: '600px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '4px' }}>Withdraw Funds</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '24px' }}>Complete security requirements to unlock withdrawals</p>
+          <div style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '16px', padding: '24px', marginBottom: '20px' }}>
+            <div style={{ fontSize: '40px', textAlign: 'center', marginBottom: '12px' }}>🔒</div>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, textAlign: 'center', marginBottom: '4px' }}>Withdrawals Locked</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', textAlign: 'center', marginBottom: '20px' }}>Complete all 3 security steps to unlock withdrawals</p>
+            {steps.map((step, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: '14px',
+                padding: '14px', borderRadius: '12px', marginBottom: '10px',
+                background: step.done ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)',
+                border: `1px solid ${step.done ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
+              }}>
+                <span style={{ fontSize: '20px', flexShrink: 0 }}>{step.done ? '✅' : '❌'}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700 }}>{step.label}</div>
+                  {!step.done && <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>{step.desc}</div>}
+                </div>
+                {!step.done && step.link && kycStatus !== 'pending' && (
+                  <a href={step.link} style={{ fontSize: '12px', fontWeight: 700, color: 'white', background: 'linear-gradient(135deg,#10b981,#059669)', padding: '6px 14px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                    {step.linkLabel}
+                  </a>
+                )}
+                {!step.done && kycStatus === 'pending' && step.label === 'KYC Verified' && (
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#f59e0b', background: 'rgba(245,158,11,0.1)', padding: '4px 10px', borderRadius: '20px' }}>Under Review</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    )
+      )
+    }
   }
 
   return (
